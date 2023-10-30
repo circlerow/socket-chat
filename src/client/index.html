@@ -1,0 +1,38 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>User1</title>
+  <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"
+          integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs"
+          crossorigin="anonymous"></script>
+  <script>
+    const socket = io("http://localhost:3000");
+    socket.on("connect", function() {
+      console.log("Connected");
+    });
+    socket.on("disconnect", function() {
+      console.log("Disconnected");
+    });
+  </script>
+</head>
+
+<body>
+<h1>Socket.io Client</h1>
+<input type="text" id="message" />
+<button
+  onclick=sendMessage()>Send
+</button>
+<p id="messages"></p>
+<script>
+  socket.on("message1-2", function(data) {
+    console.log("message", data);
+    document.getElementById("messages").innerHTML += "User2: " + data + "<br />";
+  });
+
+  function sendMessage() {
+    socket.emit("message1-2", document.getElementById("message").value);
+    document.getElementById("messages").innerHTML += "You: " + document.getElementById("message").value + "<br />";
+  }
+</script>
+</body>
+</html>
