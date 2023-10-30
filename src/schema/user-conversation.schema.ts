@@ -5,7 +5,7 @@ export type UserConversationDocument = UserConversation & Document;
 @Schema({ timestamps: true })
 export class UserConversation {
   @Prop({ required: true })
-  messageId: string[];
+  messageId?: string[];
 
   @Prop({ required: true })
   conversationId: string;

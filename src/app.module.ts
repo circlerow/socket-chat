@@ -7,6 +7,9 @@ import { UserModule } from "./module/user/user.module";
 import { AuthModule } from "./module/auth/auth.module";
 import { JwtModule } from "@nestjs/jwt";
 import { DevtoolsModule } from "@nestjs/devtools-integration";
+import { ConversationModule } from "./module/conversation/conversation.module";
+import { MessageModule } from "./module/message/message.module";
+import { UserConversationModule } from "./module/user-conversation/user-conversation.module";
 
 @Module({
   imports: [
@@ -25,7 +28,10 @@ import { DevtoolsModule } from "@nestjs/devtools-integration";
     JwtModule,
     UserModule,
     AuthModule,
-    EventsModule
+    EventsModule,
+    ConversationModule,
+    MessageModule,
+    UserConversationModule
   ]
 })
 export class AppModule {
