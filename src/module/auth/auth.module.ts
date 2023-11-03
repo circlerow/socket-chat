@@ -26,7 +26,8 @@ import config from "../../config";
     UserModule
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JsonWebTokenStrategy, UserService, ConfigService]
+  providers: [AuthService, LocalStrategy, JsonWebTokenStrategy, UserService, ConfigService],
+  exports: [JwtModule]
 })
 export class AuthModule {
 }

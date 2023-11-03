@@ -5,10 +5,13 @@ export type ConversationDocument = Conversation & Document;
 @Schema({ timestamps: true })
 export class Conversation {
   @Prop({ required: true })
-  userConversationId: string[];
+  userConversationIds: string[];
 
   @Prop({ required: true })
   conversationId: string;
+
+  @Prop({ required: true })
+  userIds: string[];
 }
 
 export const ConversationSchema = SchemaFactory.createForClass(Conversation);
