@@ -15,7 +15,11 @@ export class MessageService {
     return await this.messageModel.create(message);
   }
 
-  async getMessagesByConversationId(conversationId: string) {
-    return this.messageModel.find({ conversationId });
+  async getMessagesByUserConversationId(userConversationId: string) {
+    return this.messageModel.find({ userConversationId });
+  }
+
+  async getMessageById(id: string) {
+    return this.messageModel.findById(id);
   }
 }

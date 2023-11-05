@@ -2,8 +2,10 @@ import { Module } from "@nestjs/common";
 import { AppGateway } from "./app.gateway";
 import { JwtModule } from "@nestjs/jwt";
 import { UserModule } from "../module/user/user.module";
-import { UserService } from "../module/user/user.service";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { UserConversationModule } from "../module/user-conversation/user-conversation.module";
+import { MessageModule } from "../module/message/message.module";
+import { InformationModule } from "../module/information/information.module";
 
 @Module({
   imports: [
@@ -18,8 +20,12 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
           }
         };
       }
-    }), UserModule],
-  providers: [AppGateway, UserService]
+    }), UserModule,
+    UserConversationModule,
+    MessageModule,
+    InformationModule
+  ],
+  providers: [AppGateway]
 })
 export class EventsModule {
 }

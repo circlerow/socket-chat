@@ -19,8 +19,7 @@ export class ConversationService {
 
   async createConversation(conversationId: string) {
     const userConversation = await this.getUserConversations(conversationId);
-    console.log(userConversation);
-    const userConversationIds = userConversation.map(userConversation => userConversation._id);
+    const userConversationIds = userConversation.map(userConversation => userConversation.id);
     const userIds = userConversation.map(userConversation => userConversation.userId);
     const conversation = {
       conversationId,
@@ -30,5 +29,8 @@ export class ConversationService {
     return await this.conversationModel.create(conversation);
   }
 
+  async findConversationById(id: string) {
+    return this.conversationModel.findById(id);
+  }
 
 }

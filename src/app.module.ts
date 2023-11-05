@@ -9,6 +9,7 @@ import { ConversationModule } from "./module/conversation/conversation.module";
 import { MessageModule } from "./module/message/message.module";
 import { UserConversationModule } from "./module/user-conversation/user-conversation.module";
 import { EventsModule } from "./gateway/gateway.module";
+import { InformationModule } from "./module/information/information.module";
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { EventsModule } from "./gateway/gateway.module";
     EventsModule,
     ConversationModule,
     MessageModule,
-    UserConversationModule
+    UserConversationModule,
+    InformationModule
   ]
 })
 export class AppModule {

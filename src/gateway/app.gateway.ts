@@ -8,8 +8,11 @@ import { Server, Socket } from "socket.io";
 import { HttpException, HttpStatus, Logger } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "../module/user/user.service";
-import { User } from "../schema";
+import { Message, User } from "../schema";
 import { IUser } from "./interface/user.interface";
+import { UserConversationService } from "../module/user-conversation/user-conversation.service";
+import { MessageService } from "../module/message/message.service";
+import { InformationService } from "../module/information/information.service";
 
 @WebSocketGateway({
   cors: {
@@ -22,7 +25,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly userConversationService: UserConversationService,
+    private readonly messageService: MessageService,
+    private readonly informationService: InformationService
   ) {
   }
 
@@ -32,18 +38,30 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
   async handleConnection(client: Socket) {
     this.logger.log(client.id, "Connected..............................");
-    console.log(client.id);
     const user: IUser = await this.getDataUserFromToken(client);
-    console.log(user.id);
+    const information = {
+      userId: user.id,
+      value: client.id
+    };
+    await this.informationService.createInformation(information);
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
+    const user: IUser = await this.getDataUserFromToken(client);
+    const information = {
+      userId: user.id,
+      value: client.id
+    };
+    await this.informationService.deleteInformation(information);
     this.logger.log(client.id, "Disconnect");
   }
 
   @SubscribeMessage("message")
-  async onChat1(@MessageBody() data: string): Promise<void> {
-    console.log(data);
+  async messages(client: Socket, payload: Message): Promise<void> {
+    const message = await this.messageService.createMessage(payload);
+    await this.userConversationService.updateLastMessageId(payload.userConversationId, message.id);
+
+    this.server.emit("message-received", message);
   }
 
   async getDataUserFromToken(client: Socket): Promise<IUser> {
@@ -52,7 +70,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
       const decoded = this.jwtService.verify(authToken);
       return await this.userService.getByEmail(decoded.email);
     } catch (ex) {
-      throw new HttpException("Not found", HttpStatus.NOT_FOUND);
+      this.logger.error(new HttpException("Not found", HttpStatus.NOT_FOUND));
     }
   }
 }

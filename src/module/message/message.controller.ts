@@ -15,7 +15,7 @@ export class MessageController {
   }
 
   @Get("get-by-conversation-id")
-  getMessagesByConversationId(@Body("conversationId") conversationId: string) {
-    return this.messageService.getMessagesByConversationId(conversationId);
+  getMessagesByConversationId(@Body("userConversationId") userConversationId: string) {
+    return this.messageService.getMessagesByUserConversationId(userConversationId);
   }
 }

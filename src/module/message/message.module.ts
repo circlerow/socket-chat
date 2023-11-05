@@ -14,7 +14,7 @@ import { MessageService } from "./message.service";
       }
     ])
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, MessageService],
   controllers: [MessageController],
   providers: [MessageService]
 })

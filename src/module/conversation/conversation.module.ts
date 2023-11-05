@@ -5,6 +5,7 @@ import { ConversationController } from "./conversation.controller";
 import { ConversationService } from "./conversation.service";
 import { UserConversationModule } from "../user-conversation/user-conversation.module";
 import { UserConversationService } from "../user-conversation/user-conversation.service";
+import { MessageModule } from "../message/message.module";
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { UserConversationService } from "../user-conversation/user-conversation.
         collection: "Conversation"
       }
     ]),
-    UserConversationModule
+    UserConversationModule,
+    MessageModule
   ],
   exports: [MongooseModule],
   controllers: [ConversationController],

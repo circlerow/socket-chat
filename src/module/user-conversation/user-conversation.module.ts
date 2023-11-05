@@ -3,6 +3,8 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { UserConversationSchema } from "../../schema";
 import { UserConversationService } from "./user-conversation.service";
 import { UserConversationController } from "./user-conversation.controller";
+import { UserModule } from "../user/user.module";
+import { MessageModule } from "../message/message.module";
 
 @Module({
   imports: [
@@ -12,9 +14,10 @@ import { UserConversationController } from "./user-conversation.controller";
         schema: UserConversationSchema,
         collection: "UserConversation"
       }
-    ])
+    ]),
+    MessageModule
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, UserConversationService],
   controllers: [UserConversationController],
   providers: [UserConversationService]
 })
