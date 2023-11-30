@@ -1,22 +1,21 @@
-import { Module } from "@nestjs/common";
-import { MongooseModule } from "@nestjs/mongoose";
-import { MessageSchema } from "../../schema";
-import { MessageController } from "./message.controller";
-import { MessageService } from "./message.service";
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { MessageSchema } from '../../schema';
+import { MessageController } from './message.controller';
+import { MessageService } from './message.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: "Message",
+        name: 'Message',
         schema: MessageSchema,
-        collection: "Message"
-      }
-    ])
+        collection: 'Message',
+      },
+    ]),
   ],
   exports: [MongooseModule, MessageService],
   controllers: [MessageController],
-  providers: [MessageService]
+  providers: [MessageService],
 })
-export class MessageModule {
-}
+export class MessageModule {}

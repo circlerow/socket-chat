@@ -1,15 +1,14 @@
-import { Injectable } from "@nestjs/common";
-import { Information } from "../../schema";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Injectable } from '@nestjs/common';
+import { Information } from '../../schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class InformationService {
   constructor(
     @InjectModel(Information.name)
-    private readonly informationModel: Model<Information>
-  ) {
-  }
+    private readonly informationModel: Model<Information>,
+  ) {}
 
   async createInformation(information: Information) {
     return await this.informationModel.create(information);

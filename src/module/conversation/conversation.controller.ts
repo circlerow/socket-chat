@@ -1,16 +1,12 @@
-import { Body, Controller, Post } from "@nestjs/common";
-import { ConversationService } from "./conversation.service";
-import { Conversation } from "../../schema";
+import { Body, Controller, Post } from '@nestjs/common';
+import { ConversationService } from './conversation.service';
 
-@Controller("conversation")
+@Controller('conversation')
 export class ConversationController {
-  constructor(
-    private readonly conversationService: ConversationService
-  ) {
-  }
+  constructor(private readonly conversationService: ConversationService) {}
 
-  @Post("create")
-  createConversation(@Body("conversationId") conversationId: string) {
+  @Post('create')
+  createConversation(@Body('conversationId') conversationId: string) {
     return this.conversationService.createConversation(conversationId);
   }
 }

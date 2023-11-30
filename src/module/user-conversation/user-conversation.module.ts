@@ -1,25 +1,23 @@
-import { Module } from "@nestjs/common";
-import { MongooseModule } from "@nestjs/mongoose";
-import { UserConversationSchema } from "../../schema";
-import { UserConversationService } from "./user-conversation.service";
-import { UserConversationController } from "./user-conversation.controller";
-import { UserModule } from "../user/user.module";
-import { MessageModule } from "../message/message.module";
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserConversationSchema } from '../../schema';
+import { UserConversationService } from './user-conversation.service';
+import { UserConversationController } from './user-conversation.controller';
+import { MessageModule } from '../message/message.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       {
-        name: "UserConversation",
+        name: 'UserConversation',
         schema: UserConversationSchema,
-        collection: "UserConversation"
-      }
+        collection: 'UserConversation',
+      },
     ]),
-    MessageModule
+    MessageModule,
   ],
   exports: [MongooseModule, UserConversationService],
   controllers: [UserConversationController],
-  providers: [UserConversationService]
+  providers: [UserConversationService],
 })
-export class UserConversationModule {
-}
+export class UserConversationModule {}

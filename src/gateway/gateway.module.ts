@@ -1,11 +1,11 @@
-import { Module } from "@nestjs/common";
-import { AppGateway } from "./app.gateway";
-import { JwtModule } from "@nestjs/jwt";
-import { UserModule } from "../module/user/user.module";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { UserConversationModule } from "../module/user-conversation/user-conversation.module";
-import { MessageModule } from "../module/message/message.module";
-import { InformationModule } from "../module/information/information.module";
+import { Module } from '@nestjs/common';
+import { AppGateway } from './app.gateway';
+import { JwtModule } from '@nestjs/jwt';
+import { UserModule } from '../module/user/user.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserConversationModule } from '../module/user-conversation/user-conversation.module';
+import { MessageModule } from '../module/message/message.module';
+import { InformationModule } from '../module/information/information.module';
 
 @Module({
   imports: [
@@ -14,18 +14,18 @@ import { InformationModule } from "../module/information/information.module";
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
         return {
-          secret: configService.get<string>("jwt.secret"),
+          secret: configService.get<string>('jwt.secret'),
           signOptions: {
-            expiresIn: configService.get<string>("jwt.expiresIn")
-          }
+            expiresIn: configService.get<string>('jwt.expiresIn'),
+          },
         };
-      }
-    }), UserModule,
+      },
+    }),
+    UserModule,
     UserConversationModule,
     MessageModule,
-    InformationModule
+    InformationModule,
   ],
-  providers: [AppGateway]
+  providers: [AppGateway],
 })
-export class EventsModule {
-}
+export class EventsModule {}
