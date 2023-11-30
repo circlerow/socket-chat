@@ -32,4 +32,22 @@ export class UserService {
       new: true,
     });
   }
+
+  async getInfoUser(request: Request) {
+    const bearerToken = (request.headers as any).authorization?.split('.')[1];
+    const payloadJson = JSON.parse(
+      Buffer.from(bearerToken, 'base64').toString('utf8'),
+    );
+    return await this.userModel.findOne({
+      email: payloadJson.email,
+    });
+  }
+
+  async updateUserConversationId(userId: string, userConversationId: string) {
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $push: { userConversationId: userConversationId } },
+      { new: true },
+    );
+  }
 }

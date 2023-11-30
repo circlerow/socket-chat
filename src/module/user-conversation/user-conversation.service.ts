@@ -14,7 +14,10 @@ export class UserConversationService {
   ) {}
 
   async createUsersConversation(initConversation: InitConversationDto) {
-    return await this.userConversationModel.create(initConversation);
+    return await this.userConversationModel.create({
+      ...initConversation,
+      messageId: [],
+    });
   }
 
   async get(conversationId: string) {
@@ -28,7 +31,7 @@ export class UserConversationService {
   async updateLastMessageId(userConversationId: string, lastMessageId: string) {
     const updateMessageId = this.userConversationModel.findByIdAndUpdate(
       userConversationId,
-      { $push: { messageId: lastMessageId } },
+      { $push: { messageId: { $each: [lastMessageId], $position: 0 } } },
       { new: true },
     );
     if (!updateMessageId) {
@@ -43,14 +46,21 @@ export class UserConversationService {
   async getMessage(userConversationId: string) {
     const userConversation =
       await this.userConversationModel.findById(userConversationId);
-    return userConversation.messageId;
-  }
+    const messageIds = userConversation.messageId;
 
-  async getMessageContent(userConversationId: string) {
-    const listId = await this.getMessage(userConversationId);
-    const listMessage = listId.map(async (messageId) => {
+    const messagePromises = messageIds.map(async (messageId) => {
       return await this.messageService.getMessageById(messageId);
     });
-    return await Promise.all(listMessage);
+    const messages = await Promise.all(messagePromises);
+
+    return messages;
   }
+
+  // async getMessageContent(userConversationId: string) {
+  //   const listId = await this.getMessage(userConversationId);
+  //   const listMessage = listId.map(async (messageId) => {
+  //     return await this.messageService.getMessageById(messageId);
+  //   });
+  //   return await Promise.all(listMessage);
+  // }
 }

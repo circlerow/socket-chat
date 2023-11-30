@@ -5,6 +5,7 @@ import {
   HttpException,
   Param,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -33,5 +34,10 @@ export class UserController {
   @Put('/:id')
   async update(@Param('id') id: string, @Body() user: User) {
     return await this.userService.update(id, user);
+  }
+
+  @Get()
+  async getUser(@Req() req) {
+    return await this.userService.getInfoUser(req);
   }
 }

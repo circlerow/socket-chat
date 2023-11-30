@@ -15,17 +15,17 @@ export class UserConversationController {
     );
   }
 
-  @Get('get-messages-id')
+  @Get('get-list-messages')
   getMessageIdByUserConversation(
     @Body('userConversationId') userConversationId: string,
   ) {
     return this.userConversationService.getMessage(userConversationId);
   }
 
-  @Get('get-messages-content')
-  getMessageContentByUserConversation(
-    @Body('userConversationId') userConversationId: string,
-  ) {
-    return this.userConversationService.getMessageContent(userConversationId);
-  }
+  // @Get('get-messages-content')
+  // getMessageContentByUserConversation(
+  //   @Body('userConversationId') userConversationId: string,
+  // ) {
+  //   return this.userConversationService.getMessageContent(userConversationId);
+  // }
 }

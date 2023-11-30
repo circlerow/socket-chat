@@ -19,6 +19,10 @@ export class MessageService {
   }
 
   async getMessageById(id: string) {
-    return this.messageModel.findById(id);
+    const message: any = await this.messageModel.findById(id);
+    return {
+      message: message.message,
+      createdAt: message.createdAt,
+    };
   }
 }

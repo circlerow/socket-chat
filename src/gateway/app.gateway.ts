@@ -41,12 +41,6 @@ export class AppGateway
 
   async handleConnection(client: Socket) {
     this.logger.log(client.id, 'Connected..............................');
-    const user: IUser = await this.getDataUserFromToken(client);
-    const information = {
-      userId: user.id,
-      value: client.id,
-    };
-    await this.informationService.createInformation(information);
   }
 
   async handleDisconnect(client: Socket) {

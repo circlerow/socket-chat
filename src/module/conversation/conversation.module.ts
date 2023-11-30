@@ -6,6 +6,7 @@ import { ConversationService } from './conversation.service';
 import { UserConversationModule } from '../user-conversation/user-conversation.module';
 import { UserConversationService } from '../user-conversation/user-conversation.service';
 import { MessageModule } from '../message/message.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MessageModule } from '../message/message.module';
     ]),
     UserConversationModule,
     MessageModule,
+    UserModule,
   ],
   exports: [MongooseModule],
   controllers: [ConversationController],
