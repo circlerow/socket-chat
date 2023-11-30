@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { IInitConversation } from './conversation.interface';
 
@@ -14,5 +14,10 @@ export class ConversationController {
   @Post('create')
   createConversation(@Body('conversationId') conversationId: string) {
     return this.conversationService.createConversation(conversationId);
+  }
+
+  @Get('all')
+  getAllConversation(@Body() userIds: any) {
+    return this.conversationService.getAllConversation(userIds);
   }
 }

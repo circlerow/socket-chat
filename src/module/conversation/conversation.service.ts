@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { UserConversationService } from '../user-conversation/user-conversation.service';
 import { IInitConversation } from './conversation.interface';
 import { UserService } from '../user/user.service';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ConversationService {
@@ -40,20 +41,21 @@ export class ConversationService {
   }
 
   async checkOrCreateConversation(initConversation: IInitConversation) {
-    const { conversationId, user1Id, user2Id } = initConversation;
+    const { user1Id, user2Id } = initConversation;
     const usersId = [user1Id, user2Id];
     const existConversation = await this.conversationModel.findOne({
       userIds: { $all: usersId },
     });
-    const user1Conversation = {
-      conversationId,
-      userId: user1Id,
-    };
-    const user2Conversation = {
-      conversationId,
-      userId: user2Id,
-    };
     if (!existConversation) {
+      const conversationId = randomUUID();
+      const user1Conversation = {
+        conversationId,
+        userId: user1Id,
+      };
+      const user2Conversation = {
+        conversationId,
+        userId: user2Id,
+      };
       const user1ConversatinId =
         await this.userConversationService.createUsersConversation(
           user1Conversation,
@@ -81,5 +83,38 @@ export class ConversationService {
       });
     }
     return existConversation;
+  }
+
+  async getAllConversation(userIds: any) {
+    const conversation = await this.checkOrCreateConversation(userIds);
+    let user1Conversation = conversation.userConversationIds[0];
+    let user2Conversation = conversation.userConversationIds[1];
+    if (userIds.user1Id === conversation.userIds[1]) {
+      user1Conversation = conversation.userConversationIds[1];
+      user2Conversation = conversation.userConversationIds[0];
+    }
+    const user1Messages =
+      await this.userConversationService.getMessage(user1Conversation);
+    const user2Messages =
+      await this.userConversationService.getMessage(user2Conversation);
+    const myMessage = user1Messages.map((message) => {
+      return {
+        message: message.message,
+        time: message.createdAt,
+        isMine: true,
+      };
+    });
+    const yourMessage = user2Messages.map((message) => {
+      return {
+        message: message.message,
+        time: message.createdAt,
+        isMine: false,
+      };
+    });
+    const messages = [...myMessage, ...yourMessage];
+    messages.sort((a, b) => {
+      return a.time - b.time;
+    });
+    return messages;
   }
 }
