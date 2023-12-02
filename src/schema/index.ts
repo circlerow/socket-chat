@@ -10,8 +10,3 @@ export {
   UserConversation,
   UserConversationSchema,
 } from './user-conversation.schema';
-export {
-  InformationDocument,
-  Information,
-  InformationSchema,
-} from './infomation.schema';

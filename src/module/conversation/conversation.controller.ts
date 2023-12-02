@@ -1,23 +1,15 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
-import { IInitConversation } from './conversation.interface';
 
 @Controller('conversation')
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
 
-  @Post('init')
-  checkOrCreateConversation(@Body() initConversation: IInitConversation) {
-    return this.conversationService.checkOrCreateConversation(initConversation);
-  }
-
-  @Post('create')
-  createConversation(@Body('conversationId') conversationId: string) {
-    return this.conversationService.createConversation(conversationId);
-  }
-
-  @Get('all')
-  getAllConversation(@Body() userIds: any) {
-    return this.conversationService.getAllConversation(userIds);
+  @Post('current-conversation')
+  getCurrentConversation(
+    @Body('userId') userId: string,
+    @Req() request: Request,
+  ) {
+    return this.conversationService.getCurrent(userId, request);
   }
 }

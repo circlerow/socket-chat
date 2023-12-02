@@ -5,7 +5,6 @@ import { UserModule } from '../module/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserConversationModule } from '../module/user-conversation/user-conversation.module';
 import { MessageModule } from '../module/message/message.module';
-import { InformationModule } from '../module/information/information.module';
 
 @Module({
   imports: [
@@ -24,7 +23,6 @@ import { InformationModule } from '../module/information/information.module';
     UserModule,
     UserConversationModule,
     MessageModule,
-    InformationModule,
   ],
   providers: [AppGateway],
 })

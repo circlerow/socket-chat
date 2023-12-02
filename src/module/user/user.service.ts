@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from '../../schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { IUser } from '../../gateway/interface/user.interface';
+import { IUser } from '../../share/interface/user.interface';
 
 @Injectable()
 export class UserService {
@@ -15,8 +15,10 @@ export class UserService {
     return this.userModel.findOne({ email: email });
   }
 
-  async getAll() {
-    return this.userModel.find();
+  async getAll(request: Request) {
+    const owner = await this.getInfoUser(request);
+    const users = await this.userModel.find();
+    return users.filter((user) => user._id.toString() !== owner._id.toString());
   }
 
   async create(user: User) {
@@ -49,5 +51,10 @@ export class UserService {
       { $push: { userConversationId: userConversationId } },
       { new: true },
     );
+  }
+
+  async getUserId(request: Request): Promise<string> {
+    const userInfor = await this.getInfoUser(request);
+    return userInfor._id.toString();
   }
 }

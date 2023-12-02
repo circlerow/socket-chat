@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserConversationSchema } from '../../schema';
 import { UserConversationService } from './user-conversation.service';
-import { UserConversationController } from './user-conversation.controller';
 import { MessageModule } from '../message/message.module';
 
 @Module({
@@ -17,7 +16,6 @@ import { MessageModule } from '../message/message.module';
     MessageModule,
   ],
   exports: [MongooseModule, UserConversationService],
-  controllers: [UserConversationController],
   providers: [UserConversationService],
 })
 export class UserConversationModule {}

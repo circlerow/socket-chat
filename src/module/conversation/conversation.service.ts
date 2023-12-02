@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Conversation } from '../../schema';
 import { Model } from 'mongoose';
 import { UserConversationService } from '../user-conversation/user-conversation.service';
-import { IInitConversation } from './conversation.interface';
+import { IInitConversation } from '../../share/interface/conversation.interface';
 import { UserService } from '../user/user.service';
 import { randomUUID } from 'crypto';
 
@@ -16,76 +16,56 @@ export class ConversationService {
     private readonly userService: UserService,
   ) {}
 
-  async getUserConversations(conversationId: string) {
-    return await this.userConversationService.get(conversationId);
+  async getConversation(initConversation: IInitConversation) {
+    const { user1Id, user2Id } = initConversation;
+    const usersId = [user1Id, user2Id];
+    return await this.conversationModel.findOne({
+      userIds: { $all: usersId },
+    });
   }
 
-  async createConversation(conversationId: string) {
-    const userConversation = await this.getUserConversations(conversationId);
-    const userConversationIds = userConversation.map(
-      (userConversation) => userConversation.id,
+  async createConversation(initConversation: IInitConversation) {
+    const { user1Id, user2Id } = initConversation;
+    const conversationId = randomUUID();
+    const user1ConversationId =
+      await this.userConversationService.createUsersConversation({
+        conversationId,
+        userId: user1Id,
+      });
+    const user2ConversationId =
+      await this.userConversationService.createUsersConversation({
+        conversationId,
+        userId: user2Id,
+      });
+    await this.userService.updateUserConversationId(
+      user1Id,
+      user1ConversationId,
     );
-    const userIds = userConversation.map(
-      (userConversation) => userConversation.userId,
+    await this.userService.updateUserConversationId(
+      user2Id,
+      user2ConversationId,
     );
-    const conversation = {
+    return await this.conversationModel.create({
       conversationId,
-      userConversationIds: userConversationIds,
-      userIds: userIds,
-    };
-    return await this.conversationModel.create(conversation);
-  }
-
-  async findConversationById(id: string) {
-    return this.conversationModel.findById(id);
+      userConversationIds: [user1ConversationId, user2ConversationId],
+      userIds: [user1Id, user2Id],
+    });
   }
 
   async checkOrCreateConversation(initConversation: IInitConversation) {
-    const { user1Id, user2Id } = initConversation;
-    const usersId = [user1Id, user2Id];
-    const existConversation = await this.conversationModel.findOne({
-      userIds: { $all: usersId },
-    });
-    if (!existConversation) {
-      const conversationId = randomUUID();
-      const user1Conversation = {
-        conversationId,
-        userId: user1Id,
-      };
-      const user2Conversation = {
-        conversationId,
-        userId: user2Id,
-      };
-      const user1ConversatinId =
-        await this.userConversationService.createUsersConversation(
-          user1Conversation,
-        );
-      const user2ConversatinId =
-        await this.userConversationService.createUsersConversation(
-          user2Conversation,
-        );
-      const userConversationIds = [
-        user1ConversatinId.id,
-        user2ConversatinId.id,
-      ];
-      await this.userService.updateUserConversationId(
-        user1Id,
-        userConversationIds[0],
-      );
-      await this.userService.updateUserConversationId(
-        user2Id,
-        userConversationIds[1],
-      );
-      return await this.conversationModel.create({
-        conversationId,
-        userConversationIds,
-        userIds: usersId,
-      });
+    const conversation = await this.getConversation(initConversation);
+    if (conversation) {
+      return conversation;
     }
-    return existConversation;
+    return await this.createConversation(initConversation);
   }
 
-  async getAllConversation(userIds: any) {
+  async getCurrent(userId: string, request: Request) {
+    const myUserId = await this.userService.getUserId(request);
+    const userIds = {
+      user1Id: myUserId,
+      user2Id: userId,
+    };
     const conversation = await this.checkOrCreateConversation(userIds);
     let user1Conversation = conversation.userConversationIds[0];
     let user2Conversation = conversation.userConversationIds[1];
@@ -115,6 +95,9 @@ export class ConversationService {
     messages.sort((a, b) => {
       return a.time - b.time;
     });
-    return messages;
+    return {
+      conversationId: user1Conversation,
+      messages: messages,
+    };
   }
 }

@@ -11,10 +11,9 @@ import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../module/user/user.service';
 import { Message } from '../schema';
-import { IUser } from './interface/user.interface';
+import { IUser } from '../share/interface/user.interface';
 import { UserConversationService } from '../module/user-conversation/user-conversation.service';
 import { MessageService } from '../module/message/message.service';
-import { InformationService } from '../module/information/information.service';
 
 @WebSocketGateway({
   cors: {
@@ -32,10 +31,9 @@ export class AppGateway
     private readonly userService: UserService,
     private readonly userConversationService: UserConversationService,
     private readonly messageService: MessageService,
-    private readonly informationService: InformationService,
   ) {}
 
-  afterInit(server: any): any {
+  afterInit(server: Server) {
     this.logger.log(server, 'Init');
   }
 
@@ -44,12 +42,6 @@ export class AppGateway
   }
 
   async handleDisconnect(client: Socket) {
-    const user: IUser = await this.getDataUserFromToken(client);
-    const information = {
-      userId: user.id,
-      value: client.id,
-    };
-    await this.informationService.deleteInformation(information);
     this.logger.log(client.id, 'Disconnect');
   }
 

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MessageSchema } from '../../schema';
-import { MessageController } from './message.controller';
 import { MessageService } from './message.service';
 
 @Module({
@@ -15,7 +14,6 @@ import { MessageService } from './message.service';
     ]),
   ],
   exports: [MongooseModule, MessageService],
-  controllers: [MessageController],
   providers: [MessageService],
 })
 export class MessageModule {}

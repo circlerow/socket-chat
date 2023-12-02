@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { UserConversation } from '../../schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { InitConversationDto } from './dto/init-conversation.dto';
 import { MessageService } from '../message/message.service';
+import { InitConversationDto } from 'src/share/dto/init-conversation.dto';
 
 @Injectable()
 export class UserConversationService {
@@ -13,19 +13,14 @@ export class UserConversationService {
     private readonly messageService: MessageService,
   ) {}
 
-  async createUsersConversation(initConversation: InitConversationDto) {
-    return await this.userConversationModel.create({
+  async createUsersConversation(
+    initConversation: InitConversationDto,
+  ): Promise<string> {
+    const userConversation = await this.userConversationModel.create({
       ...initConversation,
       messageId: [],
     });
-  }
-
-  async get(conversationId: string) {
-    return this.userConversationModel.find({ conversationId });
-  }
-
-  async getUserConversationById(id: string) {
-    return this.userConversationModel.findById(id);
+    return userConversation._id.toString();
   }
 
   async updateLastMessageId(userConversationId: string, lastMessageId: string) {
@@ -55,12 +50,4 @@ export class UserConversationService {
 
     return messages;
   }
-
-  // async getMessageContent(userConversationId: string) {
-  //   const listId = await this.getMessage(userConversationId);
-  //   const listMessage = listId.map(async (messageId) => {
-  //     return await this.messageService.getMessageById(messageId);
-  //   });
-  //   return await Promise.all(listMessage);
-  // }
 }
