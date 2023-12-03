@@ -11,7 +11,10 @@ export class Message {
   userConversationId: string;
 
   @Prop({ required: true })
-  userId: string;
+  fromUserId: string;
+
+  @Prop({ required: true })
+  toUserId: string;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

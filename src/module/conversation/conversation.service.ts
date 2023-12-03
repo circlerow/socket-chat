@@ -81,6 +81,8 @@ export class ConversationService {
       return {
         message: message.message,
         time: message.createdAt,
+        fromUserId: message.fromUserId,
+        toUserId: message.toUserId,
         isMine: true,
       };
     });
@@ -88,12 +90,14 @@ export class ConversationService {
       return {
         message: message.message,
         time: message.createdAt,
+        fromUserId: message.fromUserId,
+        toUserId: message.toUserId,
         isMine: false,
       };
     });
     const messages = [...myMessage, ...yourMessage];
     messages.sort((a, b) => {
-      return a.time - b.time;
+      return b.time - a.time;
     });
     return {
       conversationId: user1Conversation,

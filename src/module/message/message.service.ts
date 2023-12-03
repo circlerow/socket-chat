@@ -14,15 +14,13 @@ export class MessageService {
     return await this.messageModel.create(message);
   }
 
-  async getMessagesByUserConversationId(userConversationId: string) {
-    return this.messageModel.find({ userConversationId });
-  }
-
   async getMessageById(id: string) {
     const message: any = await this.messageModel.findById(id);
     return {
       message: message.message,
       createdAt: message.createdAt,
+      toUserId: message.toUserId,
+      fromUserId: message.fromUserId,
     };
   }
 }
