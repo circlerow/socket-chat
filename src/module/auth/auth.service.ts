@@ -4,6 +4,7 @@ import { UserService } from '../user/user.service';
 import * as bcryptjs from 'bcryptjs';
 import { CreateUserDto } from '../../share/dto/create-user.dto';
 import { LoginUserDto } from '../../share/dto/login-user.dto';
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +22,12 @@ export class AuthService {
   }
 
   async register(register: CreateUserDto) {
-    return await this.userService.create(register);
+    const id = nanoid(8);
+    const user = {
+      id,
+      ...register,
+    };
+    return await this.userService.create(user);
   }
 
   async authentication(email: string, password: string): Promise<any> {
@@ -54,6 +60,7 @@ export class AuthService {
     const payload = { email: user.email, sub: user.name };
     return {
       access_token: this.jwtService.sign(payload),
+      userId: user.id,
     };
   }
 

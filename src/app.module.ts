@@ -9,6 +9,9 @@ import { ConversationModule } from './module/conversation/conversation.module';
 import { MessageModule } from './module/message/message.module';
 import { UserConversationModule } from './module/user-conversation/user-conversation.module';
 import { EventsModule } from './gateway/gateway.module';
+import { UserInfoModule } from './module/user-info/user-info.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -24,6 +27,10 @@ import { EventsModule } from './gateway/gateway.module';
     ConfigModule.forRoot({
       load: config,
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/files',
+    }),
     JwtModule,
     UserModule,
     AuthModule,
@@ -31,6 +38,7 @@ import { EventsModule } from './gateway/gateway.module';
     ConversationModule,
     MessageModule,
     UserConversationModule,
+    UserInfoModule,
   ],
 })
 export class AppModule {}

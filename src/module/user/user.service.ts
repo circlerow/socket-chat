@@ -17,6 +17,9 @@ export class UserService {
 
   async getAll(request: Request) {
     const owner = await this.getInfoUser(request);
+    if (!owner) {
+      return [];
+    }
     const users = await this.userModel.find();
     return users.filter((user) => user._id.toString() !== owner._id.toString());
   }
@@ -37,6 +40,9 @@ export class UserService {
 
   async getInfoUser(request: Request) {
     const bearerToken = (request.headers as any).authorization?.split('.')[1];
+    if (!bearerToken) {
+      return null;
+    }
     const payloadJson = JSON.parse(
       Buffer.from(bearerToken, 'base64').toString('utf8'),
     );

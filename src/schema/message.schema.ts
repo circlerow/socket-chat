@@ -5,6 +5,9 @@ export type MessageDocument = Message & Document;
 @Schema({ timestamps: true })
 export class Message {
   @Prop({ required: true })
+  id: string;
+
+  @Prop({ required: true })
   message: string;
 
   @Prop({ required: true })
