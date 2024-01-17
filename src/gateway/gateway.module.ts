@@ -3,8 +3,8 @@ import { AppGateway } from './app.gateway';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../module/user/user.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserConversationModule } from '../module/user-conversation/user-conversation.module';
 import { MessageModule } from '../module/message/message.module';
+import { ConversationModule } from 'src/module/conversation/conversation.module';
 
 @Module({
   imports: [
@@ -21,8 +21,8 @@ import { MessageModule } from '../module/message/message.module';
       },
     }),
     UserModule,
-    UserConversationModule,
     MessageModule,
+    ConversationModule,
   ],
   providers: [AppGateway],
 })

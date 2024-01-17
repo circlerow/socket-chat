@@ -4,25 +4,29 @@ import { Model } from 'mongoose';
 import { nanoid } from 'nanoid';
 import { UserInfo } from 'src/schema/user-info.schema';
 import { getFilePath } from 'src/share/utils';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class UserInfoService {
   constructor(
     @InjectModel(UserInfo.name)
-    private readonly userModel: Model<UserInfo>,
+    private readonly userInfoModel: Model<UserInfo>,
+    private readonly userService: UserService,
   ) {}
 
   async create(user: any, avatar?: Express.Multer.File) {
+    const name = await this.userService.getUserName(user.userId);
     const userInfo = {
       id: nanoid(8),
+      name,
       ...user,
     };
     userInfo.avatar = getFilePath(avatar);
-    return await this.userModel.create(userInfo);
+    return await this.userInfoModel.create(userInfo);
   }
 
   async getUserInfo(userId: string) {
-    return await this.userModel.findOne({ userId: userId });
+    return await this.userInfoModel.findOne({ userId: userId });
   }
 
   async updateUserInfo(
@@ -33,8 +37,12 @@ export class UserInfoService {
     if (avatar) {
       userInfo.avatar = getFilePath(avatar);
     }
-    return await this.userModel.findOneAndUpdate({ userId: userId }, userInfo, {
-      new: true,
-    });
+    return await this.userInfoModel.findOneAndUpdate(
+      { userId: userId },
+      userInfo,
+      {
+        new: true,
+      },
+    );
   }
 }

@@ -8,7 +8,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserInfoService } from './userinfo.service';
+import { UserInfoService } from './user-info.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user-info')

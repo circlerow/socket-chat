@@ -1,58 +1,65 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Conversation } from '../../schema';
 import { Model } from 'mongoose';
-import { UserConversationService } from '../user-conversation/user-conversation.service';
 import { IInitConversation } from '../../share/interface/conversation.interface';
 import { UserService } from '../user/user.service';
 import { randomUUID } from 'crypto';
+import { MessageService } from '../message/message.service';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class ConversationService {
+  private readonly logger = new Logger(MessageService.name);
   constructor(
     @InjectModel(Conversation.name)
     private readonly conversationModel: Model<Conversation>,
-    private readonly userConversationService: UserConversationService,
     private readonly userService: UserService,
+    private readonly messageService: MessageService,
   ) {}
 
   async getConversation(initConversation: IInitConversation) {
     const { user1Id, user2Id } = initConversation;
-    const usersId = [user1Id, user2Id];
+    const userIds = [user1Id, user2Id];
     return await this.conversationModel.findOne({
-      userIds: { $all: usersId },
+      userIds: { $all: userIds },
     });
+  }
+
+  @Cron('0 0 0 * * *')
+  async handleCron() {
+    await this.deleteAllMessageInConversation();
+    this.logger.log('Delete all message');
+  }
+
+  async getAllConversation() {
+    return await this.conversationModel.find();
+  }
+
+  async deleteAllMessageInConversation() {
+    const conversations = await this.getAllConversation();
+    await Promise.all(
+      conversations.map(async (conversation) => {
+        conversation.message = [];
+        await conversation.save();
+      }),
+    );
   }
 
   async createConversation(initConversation: IInitConversation) {
     const { user1Id, user2Id } = initConversation;
-    const conversationId = randomUUID();
-    const user1ConversationId =
-      await this.userConversationService.createUsersConversation({
-        conversationId,
-        userId: user1Id,
-      });
-    const user2ConversationId =
-      await this.userConversationService.createUsersConversation({
-        conversationId,
-        userId: user2Id,
-      });
-    await this.userService.updateUserConversationId(
-      user1Id,
-      user1ConversationId,
-    );
-    await this.userService.updateUserConversationId(
-      user2Id,
-      user2ConversationId,
-    );
+    const id = randomUUID();
+
+    await this.userService.updateConversationId(user1Id, id);
+    await this.userService.updateConversationId(user2Id, id);
+
     return await this.conversationModel.create({
-      conversationId,
-      userConversationIds: [user1ConversationId, user2ConversationId],
+      id,
       userIds: [user1Id, user2Id],
     });
   }
 
-  async checkOrCreateConversation(initConversation: IInitConversation) {
+  async getOrCreateConversation(initConversation: IInitConversation) {
     const conversation = await this.getConversation(initConversation);
     if (conversation) {
       return conversation;
@@ -62,46 +69,82 @@ export class ConversationService {
 
   async getCurrent(userId: string, request: Request) {
     const myUserId = await this.userService.getUserId(request);
+
     const userIds = {
       user1Id: myUserId,
       user2Id: userId,
     };
-    const conversation = await this.checkOrCreateConversation(userIds);
-    let user1Conversation = conversation.userConversationIds[0];
-    let user2Conversation = conversation.userConversationIds[1];
-    if (userIds.user1Id === conversation.userIds[1]) {
-      user1Conversation = conversation.userConversationIds[1];
-      user2Conversation = conversation.userConversationIds[0];
-    }
-    const user1Messages =
-      await this.userConversationService.getMessage(user1Conversation);
-    const user2Messages =
-      await this.userConversationService.getMessage(user2Conversation);
-    const myMessage = user1Messages.map((message) => {
+
+    const conversation = await this.getOrCreateConversation(userIds);
+
+    const messages = await Promise.all(
+      conversation.message.map(async (message) => {
+        let isMine = false;
+        const { fromUserId, createdAt, messageId } = message;
+        const messageContent =
+          await this.messageService.getMessageById(messageId);
+        if (messageContent.fromUserId === myUserId) isMine = true;
+        return {
+          content: messageContent.message,
+          fromUserId,
+          createdAt,
+          from: messageContent.fromUserId,
+          to: messageContent.toUserId,
+          isMine,
+        };
+      }),
+    );
+    return { messages, conversationId: conversation.id };
+  }
+
+  async updateMessage(conversationId: string, message: any) {
+    return await this.conversationModel.findOneAndUpdate(
+      { id: conversationId },
+      {
+        $push: {
+          message: {
+            $each: [message],
+            $position: 0,
+          },
+        },
+      },
+      { new: true },
+    );
+  }
+
+  async updateLastMessage(conversationId: string, messageId: string) {
+    const conversation = await this.conversationModel.findOne({
+      id: conversationId,
+    });
+    conversation.lastMessage = messageId;
+    await conversation.save();
+  }
+
+  async getAllUser(request: Request) {
+    const userInfor = await this.userService.getInfoUser(request);
+    const allUser = await this.userService.getAll(request);
+    const conversationIds = await this.userService.getConversationIds(
+      userInfor.id,
+    );
+    const allConversationId = await Promise.all(
+      conversationIds.map(async (conversationId) => {
+        return await this.conversationModel.findOne({ id: conversationId });
+      }),
+    );
+    const users = allUser.map((user) => {
+      let lastMessage = '';
+      allConversationId.forEach((conversation) => {
+        if (conversation.userIds.includes(user.id)) {
+          lastMessage = conversation.lastMessage;
+        }
+      });
       return {
-        message: message.message,
-        time: message.createdAt,
-        fromUserId: message.fromUserId,
-        toUserId: message.toUserId,
-        isMine: true,
+        id: user.id,
+        name: user.name,
+        lastMessage,
       };
     });
-    const yourMessage = user2Messages.map((message) => {
-      return {
-        message: message.message,
-        time: message.createdAt,
-        fromUserId: message.fromUserId,
-        toUserId: message.toUserId,
-        isMine: false,
-      };
-    });
-    const messages = [...myMessage, ...yourMessage];
-    messages.sort((a, b) => {
-      return b.time - a.time;
-    });
-    return {
-      conversationId: user1Conversation,
-      messages: messages,
-    };
+
+    return users;
   }
 }

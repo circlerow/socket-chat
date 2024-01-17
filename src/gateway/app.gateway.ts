@@ -10,10 +10,10 @@ import { Server, Socket } from 'socket.io';
 import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../module/user/user.service';
-import { Message } from '../schema';
 import { IUser } from '../share/interface/user.interface';
-import { UserConversationService } from '../module/user-conversation/user-conversation.service';
 import { MessageService } from '../module/message/message.service';
+import { ConversationService } from 'src/module/conversation/conversation.service';
+import { nanoid } from 'nanoid';
 
 @WebSocketGateway({
   cors: {
@@ -29,7 +29,7 @@ export class AppGateway
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
-    private readonly userConversationService: UserConversationService,
+    private readonly conversationService: ConversationService,
     private readonly messageService: MessageService,
   ) {}
 
@@ -46,13 +46,26 @@ export class AppGateway
   }
 
   @SubscribeMessage('message')
-  async messages(client: Socket, payload: Message): Promise<void> {
-    const message = await this.messageService.createMessage(payload);
-    await this.userConversationService.updateLastMessageId(
-      payload.userConversationId,
-      message.id,
-    );
+  async messages(client: Socket, payload: any): Promise<void> {
+    const newMessage = {
+      id: nanoid(10),
+      ...payload,
+    };
 
+    const message = await this.messageService.createMessage(newMessage);
+    const messageConversation = {
+      messageId: message.id,
+      createdAt: (message as any).createdAt,
+      fromUserId: message.fromUserId,
+    };
+    await this.conversationService.updateMessage(
+      message.conversationId,
+      messageConversation,
+    );
+    await this.conversationService.updateLastMessage(
+      message.conversationId,
+      message.message,
+    );
     this.server.emit('message-received', message);
   }
 

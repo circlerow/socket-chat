@@ -21,7 +21,7 @@ export class UserService {
       return [];
     }
     const users = await this.userModel.find();
-    return users.filter((user) => user._id.toString() !== owner._id.toString());
+    return users.filter((user) => user.id.toString() !== owner.id.toString());
   }
 
   async create(user: User) {
@@ -51,16 +51,24 @@ export class UserService {
     });
   }
 
-  async updateUserConversationId(userId: string, userConversationId: string) {
-    return this.userModel.findByIdAndUpdate(
-      userId,
-      { $push: { userConversationId: userConversationId } },
+  async updateConversationId(userId: string, conversationId: string) {
+    return this.userModel.findOneAndUpdate(
+      { id: userId },
+      { $push: { conversationsId: conversationId } },
       { new: true },
     );
   }
 
   async getUserId(request: Request): Promise<string> {
     const userInfor = await this.getInfoUser(request);
-    return userInfor._id.toString();
+    return userInfor.id;
+  }
+
+  async getConversationIds(userId: string): Promise<string[]> {
+    return (await this.userModel.findOne({ id: userId })).conversationsId;
+  }
+
+  async getUserName(userId: string): Promise<string> {
+    return (await this.userModel.findOne({ id: userId })).name;
   }
 }

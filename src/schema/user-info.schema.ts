@@ -8,6 +8,9 @@ export class UserInfo {
   id: string;
 
   @Prop({ required: true })
+  name: string;
+
+  @Prop({ required: true })
   userId: string;
 
   @Prop({ required: true })
@@ -21,6 +24,9 @@ export class UserInfo {
 
   @Prop({ required: true })
   birthday: Date;
+
+  @Prop({ required: true })
+  description: string;
 }
 
 export const UserInfoSchema = SchemaFactory.createForClass(UserInfo);

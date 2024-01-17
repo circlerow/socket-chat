@@ -7,7 +7,6 @@ import { AuthModule } from './module/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConversationModule } from './module/conversation/conversation.module';
 import { MessageModule } from './module/message/message.module';
-import { UserConversationModule } from './module/user-conversation/user-conversation.module';
 import { EventsModule } from './gateway/gateway.module';
 import { UserInfoModule } from './module/user-info/user-info.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -37,7 +36,6 @@ import { join } from 'path';
     EventsModule,
     ConversationModule,
     MessageModule,
-    UserConversationModule,
     UserInfoModule,
   ],
 })

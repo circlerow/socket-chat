@@ -17,7 +17,7 @@ export class User {
   password: string;
 
   @Prop({})
-  userConversationId?: string[];
+  conversationsId?: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserInfoSchema } from 'src/schema/user-info.schema';
 import { UserInfoController } from './user-info.controller';
-import { UserInfoService } from './userinfo.service';
+import { UserInfoService } from './user-info.service';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { UserModule } from '../user/user.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -30,6 +31,7 @@ import { extname } from 'path';
         },
       }),
     }),
+    UserModule,
   ],
   exports: [MongooseModule],
   controllers: [UserInfoController],

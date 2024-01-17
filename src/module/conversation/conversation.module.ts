@@ -3,10 +3,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConversationSchema } from '../../schema';
 import { ConversationController } from './conversation.controller';
 import { ConversationService } from './conversation.service';
-import { UserConversationModule } from '../user-conversation/user-conversation.module';
-import { UserConversationService } from '../user-conversation/user-conversation.service';
 import { MessageModule } from '../message/message.module';
 import { UserModule } from '../user/user.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -17,12 +16,12 @@ import { UserModule } from '../user/user.module';
         collection: 'Conversation',
       },
     ]),
-    UserConversationModule,
     MessageModule,
     UserModule,
+    ScheduleModule.forRoot(),
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, ConversationService],
   controllers: [ConversationController],
-  providers: [ConversationService, UserConversationService],
+  providers: [ConversationService],
 })
 export class ConversationModule {}
