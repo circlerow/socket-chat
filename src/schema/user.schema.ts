@@ -18,6 +18,9 @@ export class User {
 
   @Prop({})
   conversationsId?: string[];
+
+  @Prop({ default: false })
+  hasInfo?: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

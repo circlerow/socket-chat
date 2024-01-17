@@ -51,6 +51,14 @@ export class UserService {
     });
   }
 
+  async changeHasInfo(userId: string) {
+    return this.userModel.findOneAndUpdate(
+      { id: userId },
+      { hasInfo: true },
+      { new: true },
+    );
+  }
+
   async updateConversationId(userId: string, conversationId: string) {
     return this.userModel.findOneAndUpdate(
       { id: userId },

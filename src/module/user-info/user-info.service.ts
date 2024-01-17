@@ -22,6 +22,7 @@ export class UserInfoService {
       ...user,
     };
     userInfo.avatar = getFilePath(avatar);
+    await this.userService.changeHasInfo(user.userId);
     return await this.userInfoModel.create(userInfo);
   }
 
