@@ -6,6 +6,7 @@ import { ConversationService } from './conversation.service';
 import { MessageModule } from '../message/message.module';
 import { UserModule } from '../user/user.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UserInfoModule } from '../user-info/user-info.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     MessageModule,
     UserModule,
     ScheduleModule.forRoot(),
+    UserInfoModule,
   ],
   exports: [MongooseModule, ConversationService],
   controllers: [ConversationController],

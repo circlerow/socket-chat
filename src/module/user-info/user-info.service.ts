@@ -46,4 +46,12 @@ export class UserInfoService {
       },
     );
   }
+
+  async getAvatar(userId: string) {
+    const userInfo = await this.getUserInfo(userId);
+    if (!userInfo) {
+      return null;
+    }
+    return userInfo.avatar;
+  }
 }

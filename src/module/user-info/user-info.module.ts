@@ -33,7 +33,7 @@ import { UserModule } from '../user/user.module';
     }),
     UserModule,
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, UserInfoService],
   controllers: [UserInfoController],
   providers: [UserInfoService],
 })

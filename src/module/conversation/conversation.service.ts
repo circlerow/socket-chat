@@ -7,6 +7,7 @@ import { UserService } from '../user/user.service';
 import { randomUUID } from 'crypto';
 import { MessageService } from '../message/message.service';
 import { Cron } from '@nestjs/schedule';
+import { UserInfoService } from '../user-info/user-info.service';
 
 @Injectable()
 export class ConversationService {
@@ -16,6 +17,7 @@ export class ConversationService {
     private readonly conversationModel: Model<Conversation>,
     private readonly userService: UserService,
     private readonly messageService: MessageService,
+    private readonly userInfoService: UserInfoService,
   ) {}
 
   async getConversation(initConversation: IInitConversation) {
@@ -131,19 +133,23 @@ export class ConversationService {
         return await this.conversationModel.findOne({ id: conversationId });
       }),
     );
-    const users = allUser.map((user) => {
-      let lastMessage = '';
-      allConversationId.forEach((conversation) => {
-        if (conversation.userIds.includes(user.id)) {
-          lastMessage = conversation.lastMessage;
-        }
-      });
-      return {
-        id: user.id,
-        name: user.name,
-        lastMessage,
-      };
-    });
+    const users = await Promise.all(
+      allUser.map(async (user) => {
+        let lastMessage = '';
+        allConversationId.forEach((conversation) => {
+          if (conversation.userIds.includes(user.id)) {
+            lastMessage = conversation.lastMessage;
+          }
+        });
+        const avatar = await this.userInfoService.getAvatar(user.id);
+        return {
+          id: user.id,
+          name: user.name,
+          lastMessage,
+          avatar,
+        };
+      }),
+    );
 
     return users;
   }
