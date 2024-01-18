@@ -57,6 +57,13 @@ export class AuthService {
 
   async login(loginUser: LoginUserDto) {
     const user = await this.userService.getByEmail(loginUser.email);
+    if (!user) {
+      throw new HttpException('Email is not exist', HttpStatus.FORBIDDEN);
+    }
+    const check = await this.comparePassword(loginUser.password, user.password);
+    if (!check) {
+      throw new HttpException('Password is not correct', HttpStatus.FORBIDDEN);
+    }
     const payload = { email: user.email, sub: user.name };
     return {
       access_token: this.jwtService.sign(payload),

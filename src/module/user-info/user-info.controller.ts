@@ -35,4 +35,9 @@ export class UserInfoController {
   ) {
     return await this.userInfoService.updateUserInfo(userId, userInfo, avatar);
   }
+
+  @Get('avatar/:userId')
+  async getAvatar(@Param('userId') userId: string) {
+    return await this.userInfoService.getAvatar(userId);
+  }
 }
